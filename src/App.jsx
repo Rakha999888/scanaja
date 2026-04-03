@@ -26,7 +26,9 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<LoginSelect />} />
         <Route path="/login/admin" element={<LoginAdmin />} />
-        <Route path="/login/user" element={<LoginUser />} />
+        <Route path="/login/user" element={
+          localStorage.getItem('scanaja_email') ? <Navigate to="/qrcode" replace /> : <LoginUser />
+        } />
         <Route path="/register" element={<RegisterUser />} />
         <Route path="/profile" element={<UserRoute><Profile /></UserRoute>} />
         <Route path="/qrcode" element={<UserRoute><QRCodePage /></UserRoute>} />

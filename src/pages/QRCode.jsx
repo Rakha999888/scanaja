@@ -6,6 +6,12 @@ import { db } from '../firebase'
 import Navbar from '../components/Navbar'
 import BgAssets from '../components/BgAssets'
 
+const ACARA_LIST = [
+  { id: 'freshmen-year-2027', label: 'Freshmen Year 2027' },
+  { id: 'workshop-teknologi', label: 'Workshop Teknologi' },
+  { id: 'wisuda-2026', label: 'Wisuda 2026' },
+]
+
 export default function QRCodePage() {
   const navigate = useNavigate()
   const [profile, setProfile] = useState(null)
@@ -52,7 +58,15 @@ export default function QRCodePage() {
 
             <h2 className="text-xl font-black text-gray-800 mb-1">{profile.nama}</h2>
             <p className="text-sm font-semibold text-gray-400 mb-1">{profile.email}</p>
-            <p className="text-xs font-bold text-gray-300 mb-6">{profile.jurusan}</p>
+            <p className="text-xs font-bold text-gray-300 mb-1">{profile.jurusan}</p>
+            {profile.acara && (
+              <span
+                className="inline-block rounded-full px-3 py-1 text-xs font-extrabold border-2 border-white mb-6"
+                style={{ background: '#ede9fe', color: '#5b21b6', boxShadow: '0 2px 0 rgba(0,0,0,0.07)' }}
+              >
+                {ACARA_LIST.find(a => a.id === profile.acara)?.label || profile.acara}
+              </span>
+            )}
 
             <div
               id="qr-canvas"
@@ -60,7 +74,7 @@ export default function QRCodePage() {
               style={{ background: '#ede9fe', boxShadow: 'inset 0 4px 10px rgba(0,0,0,0.07)' }}
             >
               <QRCodeCanvas
-                value={JSON.stringify({ nama: profile.nama, email: profile.email, jurusan: profile.jurusan })}
+                value={JSON.stringify({ nama: profile.nama, email: profile.email, jurusan: profile.jurusan, acara: profile.acara })}
                 size={180}
                 bgColor="transparent"
                 fgColor="#5b21b6"
@@ -78,6 +92,17 @@ export default function QRCodePage() {
               <button onClick={handleReset} className="text-xs font-bold text-gray-300 hover:text-red-400 mt-1 transition-colors">
                 Keluar
               </button>
+            </div>
+
+            {/* Peringatan */}
+            <div
+              className="mt-6 rounded-[1.25rem] border-2 border-yellow-200 bg-yellow-50 px-4 py-3 flex items-start gap-3 text-left"
+              style={{ boxShadow: '0 3px 0 rgba(0,0,0,0.06)' }}
+            >
+              <span className="text-xl shrink-0">⚠️</span>
+              <p className="text-xs font-bold text-yellow-700 leading-relaxed">
+                Tunjukkan QR Code ini saat datang ke acara. Jangan sampai hilang ya!
+              </p>
             </div>
           </div>
         </div>

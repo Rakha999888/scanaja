@@ -17,9 +17,15 @@ const JURUSAN_LIST = [
   'Sistem Informasi',
 ]
 
+const ACARA_LIST = [
+  { id: 'freshmen-year-2027', label: 'Freshmen Year 2027', icon: '🎤', desc: 'Penerimaan mahasiswa baru 2027' },
+  { id: 'workshop-teknologi', label: 'Workshop Teknologi', icon: '💻', desc: 'Workshop & pelatihan teknologi' },
+  { id: 'wisuda-2026', label: 'Wisuda 2026', icon: '🎓', desc: 'Upacara wisuda angkatan 2026' },
+]
+
 export default function Profile() {
   const navigate = useNavigate()
-  const [form, setForm] = useState({ nama: '', email: '', jurusan: '' })
+  const [form, setForm] = useState({ nama: '', email: '', jurusan: '', acara: '' })
   const [loading, setLoading] = useState(false)
   const { toasts, toast, remove } = useToast()
 
@@ -43,6 +49,7 @@ export default function Profile() {
     if (!form.nama.trim()) { toast.error('Nama wajib diisi', 'Masukkan nama lengkapmu.'); return }
     if (!form.email.trim()) { toast.error('Email wajib diisi', 'Masukkan email kampusmu.'); return }
     if (!form.jurusan) { toast.error('Jurusan belum dipilih', 'Pilih jurusanmu terlebih dahulu.'); return }
+    if (!form.acara) { toast.error('Acara belum dipilih', 'Pilih acara yang ingin kamu ikuti.'); return }
 
     setLoading(true)
     try {
@@ -144,6 +151,23 @@ export default function Profile() {
                     </select>
                   </div>
 
+                  {/* Pilih Acara */}
+                  <div className="mb-8">
+                    <label className="clay-label">Pilih Acara</label>
+                    <select
+                      name="acara" required
+                      value={form.acara} onChange={handleChange}
+                      className="clay-input appearance-none"
+                    >
+                      <option value="" disabled>Pilih acara yang ingin diikuti</option>
+                      {ACARA_LIST.map((acara) => (
+                        <option key={acara.id} value={acara.id}>
+                          {acara.icon} {acara.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
                   {form.nama && (
                     <div
                       className="rounded-[1.25rem] border-2 border-white bg-pastel-purple-bg p-4 mb-6 flex items-center gap-4"
@@ -159,6 +183,9 @@ export default function Profile() {
                         <p className="font-extrabold text-gray-700 text-sm">{form.nama}</p>
                         <p className="text-xs text-gray-400 font-semibold">{form.email || '—'}</p>
                         <p className="text-xs text-gray-400 font-semibold">{form.jurusan || '—'}</p>
+                        <p className="text-xs text-gray-400 font-semibold">
+                          {ACARA_LIST.find(a => a.id === form.acara)?.label || '—'}
+                        </p>
                       </div>
                     </div>
                   )}
@@ -169,7 +196,7 @@ export default function Profile() {
                     </button>
                     <button
                       type="button"
-                      onClick={() => setForm({ nama: '', email: '', jurusan: '' })}
+                      onClick={() => setForm({ nama: '', email: '', jurusan: '', acara: '' })}
                       className="text-sm font-bold text-gray-300 hover:text-gray-400 transition-colors"
                     >
                       Reset

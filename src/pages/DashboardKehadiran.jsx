@@ -5,11 +5,18 @@ import { db } from '../firebase'
 import BgAssets from '../components/BgAssets'
 import LoadingScreen from '../components/LoadingScreen'
 
+const ACARA_LIST = [
+  { id: 'freshmen-year-2027', label: 'Freshmen Year 2027' },
+  { id: 'workshop-teknologi', label: 'Workshop Teknologi' },
+  { id: 'wisuda-2026', label: 'Wisuda 2026' },
+]
+
 export default function DashboardKehadiran() {
   const navigate = useNavigate()
   const [absensi, setAbsensi] = useState([])
   const [loadingInit, setLoadingInit] = useState(true)
   const [filterTanggal, setFilterTanggal] = useState('')
+  const [filterAcara, setFilterAcara] = useState('Semua')
 
   useEffect(() => {
     if (!localStorage.getItem('scanaja_admin')) {
@@ -28,7 +35,10 @@ export default function DashboardKehadiran() {
   const today = new Date().toISOString().split('T')[0]
   const activeTanggal = filterTanggal || today
 
-  const filtered = absensi.filter(a => a.tanggal === activeTanggal)
+  let filtered = absensi.filter(a => a.tanggal === activeTanggal)
+  if (filterAcara !== 'Semua') filtered = filtered.filter(a => a.acara === filterAcara)
+
+  const getAcaraLabel = (id) => ACARA_LIST.find(a => a.id === id)?.label || id || '-'
 
   // Daftar tanggal unik untuk filter
   const tanggalList = [...new Set(absensi.map(a => a.tanggal))].sort((a, b) => b.localeCompare(a))
@@ -56,19 +66,29 @@ export default function DashboardKehadiran() {
               <span className="font-black text-violet-600 text-lg">ScanAja</span>
             </div>
             <div className="flex items-center gap-2">
-              <Link
-                to="/admin/scan"
-                className="px-4 py-2 rounded-[1rem] text-sm font-extrabold border-2 border-white transition-all"
-                style={{ background: '#ede9fe', color: '#5b21b6', boxShadow: '0 3px 0 rgba(0,0,0,0.08)' }}
-              >
+              <Link to="/admin/scan" className="px-4 py-2 rounded-[1rem] text-sm font-extrabold border-2 border-white transition-all"
+                style={{ background: '#ede9fe', color: '#5b21b6', boxShadow: '0 3px 0 rgba(0,0,0,0.08)' }}>
                 📷 Scan
               </Link>
-              <Link
-                to="/admin/dashboard"
-                className="px-4 py-2 rounded-[1rem] text-sm font-extrabold text-gray-400 hover:bg-violet-50 hover:text-violet-500 transition-all border-2 border-transparent"
-              >
-                ← Dashboard
-              </Link>
+              {/* Dropdown Dashboard */}
+              <div className="relative group">
+                <button className="px-4 py-2 rounded-[1rem] text-sm font-extrabold border-2 border-white transition-all flex items-center gap-1"
+                  style={{ background: '#d1fae5', color: '#065f46', boxShadow: '0 3px 0 rgba(0,0,0,0.08)' }}>
+                  📊 Dashboard <span className="text-xs">▾</span>
+                </button>
+                <div className="absolute right-0 top-full mt-2 w-52 rounded-[1.25rem] bg-white border-2 border-white overflow-hidden opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all"
+                  style={{ boxShadow: '0 10px 0 0 rgba(0,0,0,0.09)' }}>
+                  <Link to="/admin/dashboard"
+                    className="flex items-center gap-2 px-4 py-3 text-sm font-extrabold text-violet-700 hover:bg-violet-50 transition-colors">
+                    👥 Dashboard Daftar
+                  </Link>
+                  <div className="border-t border-gray-50" />
+                  <Link to="/admin/kehadiran"
+                    className="flex items-center gap-2 px-4 py-3 text-sm font-extrabold text-emerald-700 hover:bg-emerald-50 transition-colors">
+                    📋 Dashboard Kehadiran
+                  </Link>
+                </div>
+              </div>
             </div>
           </div>
         </nav>
@@ -76,7 +96,7 @@ export default function DashboardKehadiran() {
         <div className="max-w-6xl mx-auto px-6 py-8">
           <div className="mb-6">
             <h1 className="text-3xl font-black text-gray-800">Dashboard Kehadiran</h1>
-            <p className="text-sm font-semibold text-gray-400 mt-1">Data absensi masuk secara real-time</p>
+            <p className="text-sm font-semibold text-gray-400 mt-1">Data absensi yang daftar masuk secara real-time</p>
           </div>
 
           {/* Stats hari ini */}
@@ -107,21 +127,28 @@ export default function DashboardKehadiran() {
                   {filtered.length} mahasiswa hadir pada {activeTanggal}
                 </p>
               </div>
-              {/* Filter tanggal */}
-              <div className="flex flex-wrap gap-2">
-                {tanggalList.slice(0, 7).map(t => (
-                  <button
-                    key={t}
-                    onClick={() => setFilterTanggal(t)}
-                    className="px-3 py-1.5 rounded-[0.75rem] text-xs font-extrabold border-2 border-white transition-all"
-                    style={activeTanggal === t
-                      ? { background: '#065f46', color: '#fff', boxShadow: '0 3px 0 rgba(0,0,0,0.15)' }
-                      : { background: '#d1fae5', color: '#065f46', boxShadow: '0 2px 0 rgba(0,0,0,0.07)' }
-                    }
-                  >
-                    {t === today ? 'Hari Ini' : t}
-                  </button>
-                ))}
+              {/* Filter dropdown */}
+              <div className="flex flex-wrap gap-2 items-center">
+                <select
+                  value={activeTanggal}
+                  onChange={e => setFilterTanggal(e.target.value)}
+                  className="appearance-none rounded-[0.875rem] border-2 border-white px-3 py-1.5 text-xs font-extrabold text-emerald-700 cursor-pointer"
+                  style={{ background: '#d1fae5', boxShadow: '0 3px 0 rgba(0,0,0,0.08)' }}
+                >
+                  {tanggalList.length === 0 && <option value={today}>Hari Ini</option>}
+                  {tanggalList.map(t => (
+                    <option key={t} value={t}>{t === today ? `Hari Ini (${t})` : t}</option>
+                  ))}
+                </select>
+                <select
+                  value={filterAcara}
+                  onChange={e => setFilterAcara(e.target.value)}
+                  className="appearance-none rounded-[0.875rem] border-2 border-white px-3 py-1.5 text-xs font-extrabold text-emerald-700 cursor-pointer"
+                  style={{ background: '#d1fae5', boxShadow: '0 3px 0 rgba(0,0,0,0.08)' }}
+                >
+                  <option value="Semua">Semua Acara</option>
+                  {ACARA_LIST.map(a => <option key={a.id} value={a.id}>{a.label}</option>)}
+                </select>
               </div>
             </div>
 
@@ -139,11 +166,12 @@ export default function DashboardKehadiran() {
                       <th className="text-left px-4 py-4 text-xs font-extrabold text-gray-400 uppercase tracking-wide">Nama</th>
                       <th className="text-left px-4 py-4 text-xs font-extrabold text-gray-400 uppercase tracking-wide hidden sm:table-cell">Email</th>
                       <th className="text-left px-4 py-4 text-xs font-extrabold text-gray-400 uppercase tracking-wide hidden md:table-cell">Jurusan</th>
+                      <th className="text-left px-4 py-4 text-xs font-extrabold text-gray-400 uppercase tracking-wide hidden md:table-cell">Acara</th>
                       <th className="text-left px-4 py-4 text-xs font-extrabold text-gray-400 uppercase tracking-wide">Waktu</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {filtered.map(({ id, nama, email, jurusan, waktu }, i) => (
+                    {filtered.map(({ id, nama, email, jurusan, acara, waktu }, i) => (
                       <tr key={id} className="border-t border-gray-50 hover:bg-green-50/40 transition-colors">
                         <td className="px-5 py-4 text-sm font-bold text-gray-400">{i + 1}</td>
                         <td className="px-4 py-4">
@@ -159,6 +187,16 @@ export default function DashboardKehadiran() {
                         </td>
                         <td className="px-4 py-4 text-sm font-semibold text-gray-500 hidden sm:table-cell">{email || '-'}</td>
                         <td className="px-4 py-4 text-sm font-semibold text-gray-500 hidden md:table-cell">{jurusan || '-'}</td>
+                        <td className="px-4 py-4 hidden md:table-cell">
+                          {acara ? (
+                            <span
+                              className="inline-block rounded-full px-3 py-1 text-xs font-extrabold border-2 border-white"
+                              style={{ background: '#ede9fe', color: '#5b21b6', boxShadow: '0 2px 0 rgba(0,0,0,0.07)' }}
+                            >
+                              {getAcaraLabel(acara)}
+                            </span>
+                          ) : <span className="text-xs text-gray-300 font-bold">-</span>}
+                        </td>
                         <td className="px-4 py-4">
                           <span
                             className="inline-block rounded-full px-3 py-1 text-xs font-extrabold border-2 border-white"
