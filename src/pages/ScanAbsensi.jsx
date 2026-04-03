@@ -9,13 +9,25 @@ import LoadingScreen from '../components/LoadingScreen'
 export default function ScanAbsensi() {
   const navigate = useNavigate()
   const fileInputRef = useRef(null)
+  const mobileMenuRef = useRef(null)
   const [mode, setMode] = useState('idle') // idle | scanning | result
   const [result, setResult] = useState(null)
   const [loading, setLoading] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   useEffect(() => {
     if (!localStorage.getItem('scanaja_admin')) navigate('/login/admin')
   }, [navigate])
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (mobileMenuRef.current && !mobileMenuRef.current.contains(e.target)) {
+        setMobileMenuOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   async function saveAbsensi(data) {
     setLoading(true)
@@ -85,39 +97,73 @@ export default function ScanAbsensi() {
         {/* Navbar */}
         <nav className="w-full sticky top-0 z-40 px-4 pt-4 pb-2">
           <div
-            className="max-w-2xl mx-auto px-5 py-3 flex items-center justify-between bg-white/90 backdrop-blur-md rounded-[1.75rem] border-2 border-white"
+            ref={mobileMenuRef}
+            className="max-w-2xl mx-auto bg-white/90 backdrop-blur-md rounded-[1.75rem] border-2 border-white"
             style={{ boxShadow: '0 6px 0 0 rgba(0,0,0,0.08)' }}
           >
-            <div className="flex items-center gap-3">
-              <span
-                className="rounded-[1rem] px-3 py-1 text-xs font-extrabold border-2 border-white"
-                style={{ background: '#ede9fe', color: '#5b21b6', boxShadow: '0 3px 0 rgba(0,0,0,0.08)' }}
-              >
-                📷 Scan
-              </span>
-              <span className="font-black text-violet-600 text-lg">ScanAja</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Link
-                to="/admin/kehadiran"
-                className="px-4 py-2 rounded-[1rem] text-sm font-extrabold border-2 border-white transition-all"
-                style={{ background: '#d1fae5', color: '#065f46', boxShadow: '0 3px 0 rgba(0,0,0,0.08)' }}
-              >
-                📋 Kehadiran
-              </Link>
+            <div className="px-5 py-3 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <span
+                  className="rounded-[1rem] px-3 py-1 text-xs font-extrabold border-2 border-white"
+                  style={{ background: '#ede9fe', color: '#5b21b6', boxShadow: '0 3px 0 rgba(0,0,0,0.08)' }}
+                >
+                  📷 Scan
+                </span>
+                <span className="font-black text-violet-600 text-lg">ScanAja</span>
+              </div>
+              {/* Desktop menu */}
+              <div className="hidden sm:flex items-center gap-2">
+                <Link
+                  to="/admin/kehadiran"
+                  className="px-4 py-2 rounded-[1rem] text-sm font-extrabold border-2 border-white transition-all"
+                  style={{ background: '#d1fae5', color: '#065f46', boxShadow: '0 3px 0 rgba(0,0,0,0.08)' }}
+                >
+                  📋 Kehadiran
+                </Link>
+                <button
+                  onClick={() => navigate('/admin/dashboard')}
+                  className="px-4 py-2 rounded-[1rem] text-sm font-extrabold text-gray-400 hover:bg-violet-50 hover:text-violet-500 transition-all border-2 border-transparent"
+                >
+                  ← Dashboard
+                </button>
+              </div>
+              {/* Hamburger (mobile) */}
               <button
-                onClick={() => navigate('/admin/dashboard')}
-                className="px-4 py-2 rounded-[1rem] text-sm font-extrabold text-gray-400 hover:bg-violet-50 hover:text-violet-500 transition-all border-2 border-transparent"
+                onClick={() => setMobileMenuOpen(v => !v)}
+                className="sm:hidden w-10 h-10 flex flex-col items-center justify-center gap-1.5 rounded-[0.875rem] border-2 border-white"
+                style={{ background: '#ede9fe', boxShadow: '0 3px 0 rgba(0,0,0,0.08)' }}
               >
-                ← Dashboard
+                <span className={`block w-5 h-0.5 bg-violet-600 transition-all ${mobileMenuOpen ? 'rotate-45 translate-y-2' : ''}`} />
+                <span className={`block w-5 h-0.5 bg-violet-600 transition-all ${mobileMenuOpen ? 'opacity-0' : ''}`} />
+                <span className={`block w-5 h-0.5 bg-violet-600 transition-all ${mobileMenuOpen ? '-rotate-45 -translate-y-2' : ''}`} />
               </button>
             </div>
+            {/* Mobile dropdown */}
+            {mobileMenuOpen && (
+              <div className="sm:hidden border-t-2 border-gray-50 px-4 py-3 flex flex-col gap-2">
+                <Link
+                  to="/admin/kehadiran"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center gap-2 px-4 py-3 rounded-[1rem] text-sm font-extrabold border-2 border-white"
+                  style={{ background: '#d1fae5', color: '#065f46', boxShadow: '0 3px 0 rgba(0,0,0,0.08)' }}
+                >
+                  📋 Dashboard Kehadiran
+                </Link>
+                <button
+                  onClick={() => { setMobileMenuOpen(false); navigate('/admin/dashboard') }}
+                  className="flex items-center gap-2 px-4 py-3 rounded-[1rem] text-sm font-extrabold border-2 border-white"
+                  style={{ background: '#f3f0ff', color: '#7c3aed', boxShadow: '0 3px 0 rgba(0,0,0,0.08)' }}
+                >
+                  👥 Dashboard Daftar
+                </button>
+              </div>
+            )}
           </div>
         </nav>
 
-        <div className="max-w-2xl mx-auto px-4 py-8">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
           <div className="mb-6">
-            <h1 className="text-2xl font-black text-gray-800">Scan Absensi</h1>
+            <h1 className="text-2xl sm:text-3xl font-black text-gray-800">Scan Absensi</h1>
             <p className="text-sm font-semibold text-gray-400 mt-1">Scan QR Code mahasiswa untuk mencatat kehadiran</p>
           </div>
 
@@ -230,7 +276,7 @@ function ScannerView({ onSuccess, onStop }) {
       <div
         id="qr-reader"
         className="w-full rounded-[1.25rem] overflow-hidden"
-        style={{ maxWidth: 320 }}
+        style={{ maxWidth: '100%' }}
       />
       <button
         onClick={() => {
@@ -275,15 +321,15 @@ function ResultCard({ result, onReset, onScanAgain }) {
           <p className="text-xs font-semibold mt-2" style={{ color: cfg.text }}>{result.message}</p>
         )}
       </div>
-      <div className="flex gap-3">
+      <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
         <button
           onClick={onScanAgain}
-          className="clay-btn text-white px-6 text-sm"
+          className="clay-btn text-white px-6 text-sm w-full sm:w-auto"
           style={{ background: 'linear-gradient(135deg, #7c3aed, #a21caf)' }}
         >
           Scan Lagi
         </button>
-        <button onClick={onReset} className="clay-btn bg-gray-100 text-gray-500 px-6 text-sm">
+        <button onClick={onReset} className="clay-btn bg-gray-100 text-gray-500 px-6 text-sm w-full sm:w-auto">
           Reset
         </button>
       </div>
