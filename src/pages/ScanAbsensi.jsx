@@ -320,6 +320,14 @@ function ResultCard({ result, onReset, onScanAgain }) {
         {result.message && (
           <p className="text-xs font-semibold mt-2" style={{ color: cfg.text }}>{result.message}</p>
         )}
+        {isSuccess && (
+          <p className="text-xs font-semibold text-gray-500 mt-2">
+            Silahkan cek{' '}
+            <Link to="/admin/kehadiran" className="font-extrabold text-green-600 underline">
+              Dashboard Absensi
+            </Link>
+          </p>
+        )}
       </div>
       <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
         <button
