@@ -1,0 +1,134 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: 'Nunito', system-ui, sans-serif;
+  background-color: #ecfeff;
+}
+
+@layer components {
+  .clay {
+    @apply bg-white rounded-[2rem] border-2 border-white;
+    box-shadow: 0 8px 0 0 rgba(0,0,0,0.12), 0 12px 24px rgba(0,0,0,0.08);
+  }
+
+  .clay-sm {
+    @apply bg-white rounded-[1.25rem] border-2 border-white;
+    box-shadow: 0 5px 0 0 rgba(0,0,0,0.10), 0 8px 16px rgba(0,0,0,0.07);
+  }
+
+  .clay-btn {
+    @apply rounded-[1.25rem] font-extrabold px-5 py-2.5 text-sm border-2 border-white/60 cursor-pointer transition-all duration-100;
+    box-shadow: 0 5px 0 0 rgba(0,0,0,0.13);
+  }
+
+  .clay-btn:active {
+    transform: translateY(4px);
+    box-shadow: 0 2px 0 0 rgba(0,0,0,0.15);
+  }
+
+  .clay-input {
+    @apply w-full rounded-[1.25rem] border-2 border-white bg-white/80 px-4 py-3 text-gray-700 outline-none transition-all duration-150 font-semibold;
+    box-shadow: inset 0 3px 8px rgba(0,0,0,0.07);
+  }
+
+  .clay-input:focus {
+    @apply border-cyan-300 bg-white;
+    box-shadow: inset 0 3px 8px rgba(0,0,0,0.07), 0 0 0 3px rgba(103,232,249,0.25);
+  }
+
+  .clay-label {
+    @apply block text-sm font-extrabold text-gray-500 mb-1.5 ml-1;
+  }
+
+  .clay-badge {
+    @apply inline-block rounded-full px-4 py-1 text-xs font-extrabold border-2 border-white;
+    box-shadow: 0 3px 0 0 rgba(0,0,0,0.10);
+  }
+}
+
+/* Animasi karakter — didefinisikan sekali di sini, bukan inline */
+@keyframes clayBounce {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-14px); }
+}
+
+@keyframes clayWave {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-25deg); }
+  75% { transform: rotate(15deg); }
+}
+
+@keyframes clayShadow {
+  0%, 100% { transform: translateX(-50%) scaleX(1); opacity: 0.4; }
+  50% { transform: translateX(-50%) scaleX(0.6); opacity: 0.15; }
+}
+
+.anim-bounce { animation: clayBounce 1.8s ease-in-out infinite; }
+.anim-wave   { animation: clayWave 1.8s ease-in-out infinite; transform-origin: 30px 88px; }
+.anim-shadow { animation: clayShadow 1.8s ease-in-out infinite; }
+
+@keyframes floatA {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-18px) rotate(4deg); }
+}
+@keyframes floatB {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-12px) rotate(-5deg); }
+}
+@keyframes floatC {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  33% { transform: translateY(-10px) rotate(3deg); }
+  66% { transform: translateY(-20px) rotate(-3deg); }
+}
+
+/* Particle naik dari bawah */
+@keyframes particleRise {
+  0%   { transform: translateY(0) rotate(0deg);   opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 0.6; }
+  100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
+}
+
+/* Shimmer sweep */
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+/* Scroll reveal */
+.reveal {
+  opacity: 0;
+  transform: translateY(32px);
+  transition: opacity 0.6s cubic-bezier(.22,1,.36,1), transform 0.6s cubic-bezier(.22,1,.36,1);
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+
+/* Tilt card — smooth transition saat mouse leave */
+.tilt-card {
+  transition: transform 0.25s cubic-bezier(.22,1,.36,1), box-shadow 0.25s ease;
+  will-change: transform;
+}
+
+/* Shimmer text */
+.shimmer-text {
+  background: linear-gradient(90deg, #0891b2 0%, #06b6d4 30%, #38bdf8 50%, #06b6d4 70%, #0891b2 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 4s linear infinite;
+}
+
+/* Glow pulse pada tombol utama */
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 6px 0 0 rgba(8,145,178,0.4), 0 0 0 0 rgba(6,182,212,0); }
+  50%       { box-shadow: 0 6px 0 0 rgba(8,145,178,0.4), 0 0 20px 6px rgba(6,182,212,0.25); }
+}
+.btn-glow { animation: glowPulse 2.5s ease-in-out infinite; }
